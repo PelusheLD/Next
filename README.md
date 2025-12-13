@@ -1,334 +1,149 @@
-# 🏪 FV Bodegones - Sistema de Gestión de Tienda
+# FV Bodegones - Next.js
 
-Sistema completo de gestión de tienda con catálogo de productos, carrito de compras, administración y conversión automática a bolívares usando la tasa oficial del dólar.
+Aplicación web completa para FV Bodegones, migrada a **Next.js 14** con frontend y backend unificados.
 
-## ✨ Características Principales
+## 🚀 Características
 
-- 🛒 **Carrito de Compras** con cálculo automático de IVA
-- 💱 **Conversión a Bolívares** usando tasa oficial del dólar
-- 📱 **Diseño Responsivo** para móviles y desktop
-- 🎠 **Carrusel Dinámico** configurable desde admin
-- 🔍 **Búsqueda de Productos** con paginación infinita
-- 📊 **Panel de Administración** completo
-- 🚫 **Modo "Ley Seca"** para categorías
-- 📱 **Integración WhatsApp** para pedidos
-- 🎨 **UI Moderna** con Tailwind CSS y Shadcn/ui
+- ✅ **Next.js 14** con App Router
+- ✅ **Frontend y Backend unificados** - Todo en un solo servidor
+- ✅ **TypeScript** - Tipado estático
+- ✅ **Drizzle ORM** - Gestión de base de datos
+- ✅ **PostgreSQL** - Base de datos (con soporte para almacenamiento en memoria)
+- ✅ **Autenticación JWT** - Sistema de autenticación seguro
+- ✅ **Panel de Administración** - Gestión completa de productos, categorías, pedidos
+- ✅ **Tailwind CSS** - Estilos modernos
+- ✅ **shadcn/ui** - Componentes de UI
 
-## 🚀 Instalación Rápida
+## 📋 Prerrequisitos
 
-### Prerrequisitos
+- Node.js 18 o superior
+- PostgreSQL (opcional, puede usar almacenamiento en memoria para desarrollo)
+- npm o yarn
 
-Asegúrate de tener instalado:
-
-- **Node.js** (versión 18 o superior)
-- **PostgreSQL** (versión 14 o superior)
-- **Git**
-
-### Verificar Instalaciones
+## 🛠️ Instalación
 
 ```bash
-node --version    # Debe ser v18+
-npm --version     # Debe ser v8+
-psql --version    # Debe ser PostgreSQL 14+
-git --version     # Cualquier versión reciente
-```
+# Clonar el repositorio
+git clone https://github.com/PelusheLD/Next.git
+cd Next
 
-### 1. Clonar el Repositorio
-
-```bash
-git clone https://github.com/PelusheLD/FV-Bodegon.git
-cd FV-Bodegon
-```
-
-### 2. Instalar Dependencias
-
-```bash
+# Instalar dependencias
 npm install
+
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus configuraciones (DATABASE_URL, JWT_SECRET, etc.)
 ```
 
-### 3. Configurar Base de Datos
+## 🚀 Uso
+
+### Desarrollo
 
 ```bash
-# Crear base de datos
-psql -U postgres -c "CREATE DATABASE fv_bodegon;"
-
-# Crear archivo .env
-echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fv_bodegon" > .env
-```
-
-### 4. Configurar Esquema de Base de Datos
-
-```bash
-# Ejecutar migraciones
-npx drizzle-kit push
-```
-
-### 5. Ejecutar la Aplicación
-
-```bash
+# Iniciar servidor de desarrollo
 npm run dev
+
+# La aplicación estará disponible en http://localhost:3000
 ```
 
-La aplicación estará disponible en:
-- **Frontend**: http://localhost:5173
-- **Backend**: http://localhost:5000
+### Producción
+
+```bash
+# Construir para producción
+npm run build
+
+# Iniciar servidor de producción
+npm start
+```
+
+## 📝 Scripts Disponibles
+
+- `npm run dev` - Servidor de desarrollo
+- `npm run build` - Construir para producción
+- `npm run start` - Servidor de producción
+- `npm run lint` - Ejecutar linter
+- `npm run check` - Verificar tipos TypeScript
+- `npm run seed` - Poblar base de datos con datos iniciales
+- `npm run db:push` - Aplicar migraciones de base de datos
 
 ## 📁 Estructura del Proyecto
 
 ```
-FV-Bodegon/
-├── client/                 # Frontend React + Vite
-│   ├── src/
-│   │   ├── components/     # Componentes UI
-│   │   │   ├── DollarRate.tsx      # Tasa del dólar
-│   │   │   ├── ProductCard.tsx     # Tarjeta de producto
-│   │   │   ├── ShoppingCart.tsx    # Carrito de compras
-│   │   │   └── admin/              # Componentes de admin
-│   │   ├── pages/         # Páginas de la aplicación
-│   │   ├── hooks/         # Hooks personalizados
-│   │   │   └── useDollarRate.ts   # Hook para tasa del dólar
-│   │   ├── contexts/      # Contextos React
-│   │   │   └── CurrencyContext.tsx # Contexto de moneda
-│   │   └── lib/           # Utilidades
-├── server/                # Backend Express
-│   ├── routes.ts         # Rutas API
-│   ├── storage.ts        # Interfaz de almacenamiento
-│   └── storage-pg.ts     # Implementación PostgreSQL
-├── shared/               # Código compartido
-│   └── schema.ts         # Esquemas Drizzle ORM
-├── migrations/           # Migraciones de base de datos
-└── drizzle.config.ts     # Configuración Drizzle
+├── app/                    # Aplicación Next.js
+│   ├── api/               # Rutas de API
+│   │   ├── admin/         # Rutas de administración
+│   │   ├── auth/          # Autenticación
+│   │   ├── categories/    # Categorías
+│   │   ├── products/      # Productos
+│   │   ├── orders/        # Pedidos
+│   │   └── ...
+│   ├── admin/             # Panel de administración
+│   ├── page.tsx           # Página principal
+│   └── layout.tsx         # Layout principal
+├── lib/                    # Utilidades y lógica
+│   ├── db.ts              # Conexión a base de datos
+│   ├── auth.ts            # Autenticación
+│   ├── storage.ts         # Lógica de almacenamiento
+│   └── ...
+├── components/             # Componentes React
+│   ├── admin/             # Componentes del panel admin
+│   └── ui/                # Componentes de UI (shadcn/ui)
+├── contexts/               # Contextos React
+├── hooks/                  # Hooks personalizados
+├── shared/                 # Código compartido
+│   └── schema.ts          # Esquemas de base de datos
+└── public/                 # Archivos estáticos
 ```
 
-## ⚙️ Configuración Detallada
+## 🔐 Autenticación
 
-### Variables de Entorno
+El sistema usa autenticación JWT. Para acceder al panel de administración:
 
-Crea un archivo `.env` en la raíz del proyecto:
+1. Ve a `/admin/login`
+2. Usuario por defecto: `admin`
+3. Contraseña por defecto: `admin123`
 
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fv_bodegon
-NODE_ENV=development
-PORT=5000
-```
+**⚠️ IMPORTANTE:** Cambia las credenciales por defecto en producción.
 
-### Configuración de Base de Datos
+## 📚 Documentación Adicional
 
-#### Crear Usuario de Base de Datos (Opcional)
+- `COMO_PROBAR.md` - Cómo probar que Next.js funciona
+- `ESTRUCTURA_ACTUAL.md` - Estructura detallada del proyecto
+- `INSTRUCCIONES.md` - Instrucciones de uso
+- `README_NEXTJS.md` - Información sobre la migración
 
-```sql
--- Conectar a PostgreSQL
-psql -U postgres
+## 🗄️ Base de Datos
 
--- Crear usuario específico
-CREATE USER fv_user WITH PASSWORD 'tu_password_seguro';
+El proyecto usa Drizzle ORM con PostgreSQL. Las migraciones están en `/migrations`.
 
--- Dar permisos
-GRANT ALL PRIVILEGES ON DATABASE fv_bodegon TO fv_user;
-
--- Salir
-\q
-```
-
-#### Verificar Tablas Creadas
-
+Para aplicar migraciones:
 ```bash
-psql -U postgres -d fv_bodegon -c "\dt"
+npm run db:push
 ```
 
-Deberías ver las siguientes tablas:
-- `admin_users`
-- `categories`
-- `products`
-- `orders`
-- `order_items`
-- `site_settings`
-
-### Crear Usuario Administrador
-
+Para poblar con datos iniciales:
 ```bash
-node -e "
-const { drizzle } = require('drizzle-orm/postgres-js');
-const postgres = require('postgres');
-const bcrypt = require('bcryptjs');
-
-const connectionString = 'postgresql://postgres:postgres@localhost:5432/fv_bodegon';
-const client = postgres(connectionString);
-const db = drizzle(client);
-
-async function createAdmin() {
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  await db.execute(sql\`INSERT INTO admin_users (username, email, password) VALUES ('admin', 'admin@fv.com', \${hashedPassword})\`);
-  console.log('✅ Admin creado: admin@fv.com / admin123');
-  await client.end();
-}
-
-createAdmin();
-"
+npm run seed
 ```
 
-## 🎯 Scripts Disponibles
+## 🚢 Despliegue
 
-```bash
-npm run dev          # Desarrollo (frontend + backend)
-npm run build        # Build de producción
-npm run start        # Ejecutar build de producción
-npx drizzle-kit push # Aplicar cambios de DB
-npx drizzle-kit generate # Generar migraciones
-npx drizzle-kit studio # Abrir Drizzle Studio
-```
+El proyecto está listo para desplegar en:
+- **Vercel** (recomendado para Next.js)
+- **Render**
+- **Railway**
+- Cualquier plataforma que soporte Node.js
 
-## 🔧 Funcionalidades Principales
-
-### 💱 Conversión de Moneda
-
-- **Tasa Automática**: Obtiene la tasa oficial del dólar desde DolarAPI
-- **Conversión en Tiempo Real**: Todos los precios se convierten automáticamente
-- **Toggle de Moneda**: Botón para alternar entre USD y Bolívares
-- **Referencias**: Muestra equivalencias cuando está en Bolívares
-
-### 🛒 Carrito de Compras
-
-- **Cálculo de IVA**: IVA incluido configurable (por defecto 16%)
-- **Productos por Peso**: Selección de cantidad en gramos/kg
-- **Desglose Detallado**: Subtotal, IVA y total
-- **Integración WhatsApp**: Mensaje pre-formateado con pedido
-
-### 🎠 Carrusel Dinámico
-
-- **3 Slides Configurables**: Desde panel de administración
-- **Contenido Personalizable**: Títulos, imágenes, fondos, botones
-- **URLs Externas**: Botones pueden dirigir a páginas externas
-- **Control Individual**: Activar/desactivar cada slide
-
-### 🔍 Búsqueda Avanzada
-
-- **Búsqueda por Categoría**: Filtra productos dentro de categorías
-- **Paginación Infinita**: Carga productos mientras haces scroll
-- **Debounce**: Optimiza las consultas de búsqueda
-- **Backend Search**: Busca en toda la base de datos, no solo productos cargados
-
-### 🚫 Modo "Ley Seca"
-
-- **Control por Categoría**: Deshabilitar categorías completas
-- **Indicador Visual**: Banner "LEY SECA" en categorías deshabilitadas
-- **Prevención de Compra**: Productos no se pueden agregar al carrito
-
-## 🐛 Solución de Problemas
-
-### Error de Conexión a Base de Datos
-
-```bash
-# Verificar que PostgreSQL esté ejecutándose
-sudo service postgresql start  # Linux
-net start postgresql-x64-14    # Windows
-
-# Verificar conexión
-psql -U postgres -d fv_bodegon -c "SELECT 1;"
-```
-
-### Error de Puerto en Uso
-
-```bash
-# Verificar puertos disponibles
-netstat -tulpn | grep :5000
-netstat -tulpn | grep :5173
-
-# Matar proceso si es necesario
-kill -9 $(lsof -t -i:5000)
-kill -9 $(lsof -t -i:5173)
-```
-
-### Error de Dependencias
-
-```bash
-# Limpiar cache y reinstalar
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### Error de Migraciones
-
-```bash
-# Regenerar migraciones
-rm -rf migrations/
-npx drizzle-kit generate
-npx drizzle-kit push
-```
-
-## 📱 Uso de la Aplicación
-
-### Para Clientes
-
-1. **Navegar**: Explora categorías y productos
-2. **Buscar**: Usa la barra de búsqueda en categorías
-3. **Agregar al Carrito**: Haz clic en productos disponibles
-4. **Configurar Cantidad**: Para productos por peso, selecciona cantidad
-5. **Ver Carrito**: Haz clic en el ícono del carrito
-6. **Cambiar Moneda**: Usa el botón ↔ en la tasa del dólar
-7. **Finalizar Compra**: Completa datos y envía por WhatsApp
-
-### Para Administradores
-
-1. **Acceder**: Ve a `/admin` y usa credenciales de admin
-2. **Gestionar Categorías**: Crear, editar, activar/desactivar
-3. **Gestionar Productos**: Agregar, editar, configurar stock
-4. **Configurar Sitio**: Ajustar IVA, carrusel, información de contacto
-5. **Ver Pedidos**: Revisar pedidos recibidos por WhatsApp
-
-## 🚀 Despliegue en Producción
-
-### Variables de Entorno de Producción
-
-```env
-DATABASE_URL=postgresql://user:password@host:5432/fv_bodegon
-NODE_ENV=production
-PORT=5000
-```
-
-### Build de Producción
-
-```bash
-npm run build
-npm run start
-```
-
-### Consideraciones de Seguridad
-
-- Cambiar contraseñas por defecto
-- Usar HTTPS en producción
-- Configurar firewall para base de datos
-- Implementar rate limiting
-- Usar variables de entorno seguras
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+Asegúrate de configurar las variables de entorno en tu plataforma de despliegue.
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+MIT
 
-## 📞 Soporte
+## 👥 Contribuidores
 
-Si tienes problemas o preguntas:
+- PelusheLD
 
-1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
-2. Busca en los [Issues](https://github.com/PelusheLD/FV-Bodegon/issues)
-3. Crea un nuevo issue si no encuentras solución
+## 🔗 Enlaces
 
-## 🎉 Agradecimientos
-
-- [Drizzle ORM](https://orm.drizzle.team/) - ORM para TypeScript
-- [Shadcn/ui](https://ui.shadcn.com/) - Componentes UI
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- [DolarAPI](https://dolarapi.com/) - API de tasa del dólar
-- [React Query](https://tanstack.com/query) - Manejo de estado del servidor
-
----
-
-**¡Disfruta usando FV Bodegones! 🛒✨**
+- Repositorio: https://github.com/PelusheLD/Next.git
