@@ -137,54 +137,49 @@ export class PostgresStorage implements IStorage {
   }
 
   async searchProductsByCategory(categoryId: string, searchTerm: string, page: number, limit: number): Promise<{ products: Product[]; total: number; hasMore: boolean }> {
-    console.log('PostgresStorage: searchProductsByCategory called with:', { categoryId, searchTerm, page, limit });
-    
     const offset = (page - 1) * limit;
     
     // Dividir el término de búsqueda en palabras individuales
     const searchWords = searchTerm.trim().split(/\s+/).filter(word => word.length > 0);
-    console.log('PostgresStorage: searchWords:', searchWords);
     
     if (searchWords.length === 0) {
       // Si no hay palabras de búsqueda, devolver productos paginados normales
-      console.log('PostgresStorage: No search words, returning paginated products');
       return this.getProductsByCategoryPaginated(categoryId, page, limit);
     }
     
     try {
-      console.log('PostgresStorage: Starting search with words:', searchWords);
+      // Optimización: usar SQL LIKE para búsqueda en base de datos en lugar de cargar todo en memoria
+      // Construir condiciones LIKE para cada palabra
+      const conditions = searchWords.map(word => 
+        like(products.name, `%${word}%`)
+      );
       
-      // Obtener todos los productos de la categoría primero
-      const allProducts = await db.select()
+      // Contar total de resultados
+      const totalResult = await db
+        .select({ count: sql<number>`count(*)` })
         .from(products)
-        .where(eq(products.categoryId, categoryId));
+        .where(and(
+          eq(products.categoryId, categoryId),
+          ...conditions
+        ));
       
-      console.log('PostgresStorage: Total products in category:', allProducts.length);
+      const total = Number(totalResult[0]?.count || 0);
       
-      // Filtrar productos que contengan todas las palabras (en cualquier orden)
-      const filteredProducts = allProducts.filter(product => {
-        const productNameLower = product.name.toLowerCase();
-        
-        // Verificar que todas las palabras estén presentes en el nombre del producto
-        return searchWords.every(word => 
-          productNameLower.includes(word.toLowerCase())
-        );
-      });
+      // Obtener productos paginados directamente desde la BD
+      const productsResult = await db
+        .select()
+        .from(products)
+        .where(and(
+          eq(products.categoryId, categoryId),
+          ...conditions
+        ))
+        .orderBy(asc(products.name))
+        .limit(limit)
+        .offset(offset);
       
-      console.log('PostgresStorage: Filtered products count:', filteredProducts.length);
+      const hasMore = offset + productsResult.length < total;
       
-      // Ordenar alfabéticamente
-      filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-      
-      // Aplicar paginación
-      const total = filteredProducts.length;
-      const paginatedProducts = filteredProducts.slice(offset, offset + limit);
-      const hasMore = offset + paginatedProducts.length < total;
-      
-      console.log('PostgresStorage: Paginated products:', paginatedProducts.length);
-      console.log('PostgresStorage: Total matches:', total);
-      
-      return { products: paginatedProducts, total, hasMore };
+      return { products: productsResult, total, hasMore };
     } catch (error) {
       console.error('PostgresStorage: Error in searchProductsByCategory:', error);
       throw error;

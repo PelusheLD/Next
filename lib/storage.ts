@@ -100,9 +100,13 @@ export class MemStorage implements IStorage {
       contactPhone: '+1 (555) 123-4567',
       contactEmail: 'contacto@fvbodegones.com',
       contactAddress: 'Calle Principal #123, Ciudad',
-      facebookUrl: '#',
-      instagramUrl: '#',
-      twitterUrl: '#',
+      facebookUrl: null,
+      instagramUrl: null,
+      twitterUrl: null,
+      taxPercentage: '16.00',
+      enableCarousel1: true,
+      enableCarousel2: true,
+      enableCarousel3: true,
       updatedAt: new Date(),
     };
   }
@@ -355,6 +359,21 @@ export class MemStorage implements IStorage {
     return { imported: 0, errors: ['Excel import not available in memory storage'] };
   }
 
+  // Featured products
+  async getFeaturedProducts(limit: number = 12): Promise<Product[]> {
+    return Array.from(this.products.values())
+      .filter(p => p.featured)
+      .slice(0, limit);
+  }
+
+  async getProductCountsByCategory(): Promise<Record<string, number>> {
+    const counts: Record<string, number> = {};
+    Array.from(this.products.values()).forEach(product => {
+      counts[product.categoryId] = (counts[product.categoryId] || 0) + 1;
+    });
+    return counts;
+  }
+
   // Sponsors
   private sponsors: Map<string, Sponsor> = new Map();
 
@@ -398,6 +417,9 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Singleton para PostgresStorage para evitar crear múltiples instancias
+let postgresStorageInstance: any = null;
+
 // Conditionally initialize storage without importing Postgres code
 // unless DATABASE_URL is present. This allows dev mode without a DB.
 export const storage: IStorage = (() => {
@@ -409,10 +431,13 @@ export const storage: IStorage = (() => {
     const handler: ProxyHandler<any> = {
       get: (_target, prop) => {
         return async (...args: any[]) => {
-          const mod = await modPromise;
-          const impl = new mod.PostgresStorage();
+          // Crear instancia singleton solo una vez
+          if (!postgresStorageInstance) {
+            const mod = await modPromise;
+            postgresStorageInstance = new mod.PostgresStorage();
+          }
           // @ts-expect-error dynamic access
-          return impl[prop](...args);
+          return postgresStorageInstance[prop](...args);
         };
       },
     };

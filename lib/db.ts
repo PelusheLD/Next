@@ -8,7 +8,10 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20, // Máximo de conexiones en el pool
+  idleTimeoutMillis: 30000, // Cerrar conexiones inactivas después de 30s
+  connectionTimeoutMillis: 5000, // Timeout de conexión de 5s
 });
 
 export const db = drizzle(pool, { schema });
