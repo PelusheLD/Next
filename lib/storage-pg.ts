@@ -102,19 +102,24 @@ export class PostgresStorage implements IStorage {
   async getProductsByCategoryPaginated(categoryId: string, page: number, limit: number): Promise<{ products: Product[]; total: number; hasMore: boolean }> {
     const offset = (page - 1) * limit;
     
-    // Obtener productos paginados
-    const productsResult = await db.select()
-      .from(products)
-      .where(eq(products.categoryId, categoryId))
-      .limit(limit)
-      .offset(offset);
+    // Optimización: ejecutar ambas consultas en paralelo para mejor rendimiento
+    const [totalResult, productsResult] = await Promise.all([
+      // Contar total (más rápido con índice)
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(products)
+        .where(eq(products.categoryId, categoryId)),
+      // Obtener productos paginados
+      db
+        .select()
+        .from(products)
+        .where(eq(products.categoryId, categoryId))
+        .orderBy(asc(products.name))
+        .limit(limit)
+        .offset(offset)
+    ]);
     
-    // Contar total de productos
-    const totalResult = await db.select({ count: sql<number>`count(*)` })
-      .from(products)
-      .where(eq(products.categoryId, categoryId));
-    
-    const total = totalResult[0]?.count || 0;
+    const total = Number(totalResult[0]?.count || 0);
     const hasMore = offset + productsResult.length < total;
     
     return { products: productsResult, total, hasMore };
