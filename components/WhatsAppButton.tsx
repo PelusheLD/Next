@@ -25,9 +25,12 @@ export default function WhatsAppButton() {
     return null;
   }
 
+  // Type guard: asegurar que whatsappNumber no es null
+  const whatsappNumber = settings.whatsappNumber;
+
   const handleWhatsAppClick = () => {
     // Limpiar el número (remover espacios, guiones, etc.)
-    const cleanNumber = settings.whatsappNumber.replace(/[\s\-\(\)]/g, '');
+    const cleanNumber = whatsappNumber.replace(/[\s\-\(\)]/g, '');
     
     // Crear el enlace de WhatsApp
     const whatsappUrl = `https://wa.me/${cleanNumber}`;
@@ -55,7 +58,7 @@ export default function WhatsAppButton() {
           <div className="text-center">
             <div className="font-medium">¡Chatea con nosotros!</div>
             <div className="text-xs text-gray-300 mt-1">
-              {formatNumber(settings.whatsappNumber)}
+              {formatNumber(whatsappNumber)}
             </div>
           </div>
           {/* Flecha del tooltip */}
