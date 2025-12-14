@@ -260,7 +260,7 @@ export default function AdminImport() {
               <div className="mt-2">
                 <p className="font-medium">Errores encontrados:</p>
                 <ul className="list-disc list-inside text-sm">
-                  {importMutation.data.errors.slice(0, 5).map((error, index) => (
+                  {importMutation.data.errors.slice(0, 5).map((error: string, index: number) => (
                     <li key={index}>{error}</li>
                   ))}
                   {importMutation.data.errors.length > 5 && (
