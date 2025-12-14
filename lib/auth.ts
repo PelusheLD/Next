@@ -41,3 +41,5 @@ export function verifyAuth(request: NextRequest): JWTPayload | null {
   return verifyToken(token);
 }
 
+
+

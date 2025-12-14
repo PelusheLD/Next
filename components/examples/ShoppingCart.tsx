@@ -1,26 +1,31 @@
 import { useState } from 'react';
 import ShoppingCart from '../ShoppingCart';
 import { Button } from '@/components/ui/button';
+import type { Product } from '@shared/schema';
+
+interface CartItem extends Product {
+  quantity: number;
+}
 
 export default function ShoppingCartExample() {
   const [isOpen, setIsOpen] = useState(true);
-  const [items, setItems] = useState([
-    { id: '1', name: 'Coca Cola 2L', price: 3.50, quantity: 2 },
-    { id: '2', name: 'Pan Integral', price: 2.00, quantity: 1 },
+  const [items, setItems] = useState<CartItem[]>([
+    { id: '1', name: 'Coca Cola 2L', price: '3.50', categoryId: '1', imageUrl: null, measurementType: 'unit', externalCode: null, stock: '10', featured: false, createdAt: new Date(), quantity: 2 },
+    { id: '2', name: 'Pan Integral', price: '2.00', categoryId: '1', imageUrl: null, measurementType: 'unit', externalCode: null, stock: '10', featured: false, createdAt: new Date(), quantity: 1 },
   ]);
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
     if (quantity === 0) {
-      setItems(items.filter(item => item.id !== id));
+      setItems(items.filter((item: CartItem) => item.id !== id));
     } else {
-      setItems(items.map(item => 
+      setItems(items.map((item: CartItem) => 
         item.id === id ? { ...item, quantity } : item
       ));
     }
   };
 
   const handleRemoveItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
+    setItems(items.filter((item: CartItem) => item.id !== id));
   };
 
   return (

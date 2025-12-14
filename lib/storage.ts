@@ -97,16 +97,46 @@ export class MemStorage implements IStorage {
       id: crypto.randomUUID(),
       siteName: 'FV BODEGONES',
       siteDescription: 'Tu bodega de confianza para productos de consumo diario',
+      heroTitle: null,
       contactPhone: '+1 (555) 123-4567',
       contactEmail: 'contacto@fvbodegones.com',
       contactAddress: 'Calle Principal #123, Ciudad',
+      whatsappNumber: null,
       facebookUrl: null,
       instagramUrl: null,
+      instagramAccessToken: null,
       twitterUrl: null,
       taxPercentage: '16.00',
       enableCarousel1: true,
       enableCarousel2: true,
       enableCarousel3: true,
+      carouselTitle1: null,
+      carouselSubtitle1: null,
+      carouselDescription1: null,
+      carouselImage1: null,
+      carouselBackground1: null,
+      carouselButton1: null,
+      carouselUrl1: null,
+      carouselTitle2: null,
+      carouselSubtitle2: null,
+      carouselDescription2: null,
+      carouselImage2: null,
+      carouselBackground2: null,
+      carouselButton2: null,
+      carouselUrl2: null,
+      carouselTitle3: null,
+      carouselSubtitle3: null,
+      carouselDescription3: null,
+      carouselImage3: null,
+      carouselBackground3: null,
+      carouselButton3: null,
+      carouselUrl3: null,
+      latitude: '9.552533674221890',
+      longitude: '-69.205197603437410',
+      paymentBank: null,
+      paymentCI: null,
+      paymentPhone: null,
+      paymentInstructions: null,
       updatedAt: new Date(),
     };
   }
@@ -122,9 +152,10 @@ export class MemStorage implements IStorage {
   async createCategory(category: InsertCategory): Promise<Category> {
     const newCategory: Category = {
       id: crypto.randomUUID(),
-      ...category,
+      name: category.name,
       imageUrl: category.imageUrl ?? null,
       enabled: category.enabled ?? true,
+      leySeca: category.leySeca ?? false,
       createdAt: new Date(),
     };
     this.categories.set(newCategory.id, newCategory);
@@ -204,9 +235,14 @@ export class MemStorage implements IStorage {
   async createProduct(product: InsertProduct): Promise<Product> {
     const newProduct: Product = {
       id: crypto.randomUUID(),
-      ...product,
+      name: product.name,
       price: product.price.toString(),
+      categoryId: product.categoryId,
       imageUrl: product.imageUrl ?? null,
+      measurementType: product.measurementType,
+      externalCode: product.externalCode ?? null,
+      stock: product.stock ? product.stock.toString() : null,
+      featured: product.featured ?? false,
       createdAt: new Date(),
     };
     this.products.set(newProduct.id, newProduct);
@@ -217,10 +253,16 @@ export class MemStorage implements IStorage {
     const existing = this.products.get(id);
     if (!existing) return undefined;
     
-    const updated = { 
+    const updated: Product = { 
       ...existing, 
-      ...product,
-      price: product.price ? product.price.toString() : existing.price,
+      ...(product.name !== undefined && { name: product.name }),
+      ...(product.price !== undefined && { price: product.price.toString() }),
+      ...(product.categoryId !== undefined && { categoryId: product.categoryId }),
+      ...(product.imageUrl !== undefined && { imageUrl: product.imageUrl ?? null }),
+      ...(product.measurementType !== undefined && { measurementType: product.measurementType }),
+      ...(product.externalCode !== undefined && { externalCode: product.externalCode ?? null }),
+      ...(product.stock !== undefined && { stock: product.stock ? product.stock.toString() : null }),
+      ...(product.featured !== undefined && { featured: product.featured }),
     };
     this.products.set(id, updated);
     return updated;
@@ -270,12 +312,51 @@ export class MemStorage implements IStorage {
   }
 
   async updateSiteSettings(settings: InsertSiteSettings): Promise<SiteSettings> {
+    const existing = this.siteSettings;
     const updated: SiteSettings = {
-      id: this.siteSettings?.id || crypto.randomUUID(),
-      ...settings,
-      facebookUrl: settings.facebookUrl ?? null,
-      instagramUrl: settings.instagramUrl ?? null,
-      twitterUrl: settings.twitterUrl ?? null,
+      id: existing?.id || crypto.randomUUID(),
+      siteName: settings.siteName ?? existing?.siteName ?? 'FV BODEGONES',
+      siteDescription: settings.siteDescription ?? existing?.siteDescription ?? '',
+      heroTitle: settings.heroTitle ?? existing?.heroTitle ?? null,
+      contactPhone: settings.contactPhone ?? existing?.contactPhone ?? '',
+      contactEmail: settings.contactEmail ?? existing?.contactEmail ?? '',
+      contactAddress: settings.contactAddress ?? existing?.contactAddress ?? '',
+      whatsappNumber: settings.whatsappNumber ?? existing?.whatsappNumber ?? null,
+      facebookUrl: settings.facebookUrl ?? existing?.facebookUrl ?? null,
+      instagramUrl: settings.instagramUrl ?? existing?.instagramUrl ?? null,
+      instagramAccessToken: settings.instagramAccessToken ?? existing?.instagramAccessToken ?? null,
+      twitterUrl: settings.twitterUrl ?? existing?.twitterUrl ?? null,
+      taxPercentage: settings.taxPercentage ?? existing?.taxPercentage ?? '16.00',
+      enableCarousel1: settings.enableCarousel1 ?? existing?.enableCarousel1 ?? true,
+      enableCarousel2: settings.enableCarousel2 ?? existing?.enableCarousel2 ?? true,
+      enableCarousel3: settings.enableCarousel3 ?? existing?.enableCarousel3 ?? true,
+      carouselTitle1: settings.carouselTitle1 ?? existing?.carouselTitle1 ?? null,
+      carouselSubtitle1: settings.carouselSubtitle1 ?? existing?.carouselSubtitle1 ?? null,
+      carouselDescription1: settings.carouselDescription1 ?? existing?.carouselDescription1 ?? null,
+      carouselImage1: settings.carouselImage1 ?? existing?.carouselImage1 ?? null,
+      carouselBackground1: settings.carouselBackground1 ?? existing?.carouselBackground1 ?? null,
+      carouselButton1: settings.carouselButton1 ?? existing?.carouselButton1 ?? null,
+      carouselUrl1: settings.carouselUrl1 ?? existing?.carouselUrl1 ?? null,
+      carouselTitle2: settings.carouselTitle2 ?? existing?.carouselTitle2 ?? null,
+      carouselSubtitle2: settings.carouselSubtitle2 ?? existing?.carouselSubtitle2 ?? null,
+      carouselDescription2: settings.carouselDescription2 ?? existing?.carouselDescription2 ?? null,
+      carouselImage2: settings.carouselImage2 ?? existing?.carouselImage2 ?? null,
+      carouselBackground2: settings.carouselBackground2 ?? existing?.carouselBackground2 ?? null,
+      carouselButton2: settings.carouselButton2 ?? existing?.carouselButton2 ?? null,
+      carouselUrl2: settings.carouselUrl2 ?? existing?.carouselUrl2 ?? null,
+      carouselTitle3: settings.carouselTitle3 ?? existing?.carouselTitle3 ?? null,
+      carouselSubtitle3: settings.carouselSubtitle3 ?? existing?.carouselSubtitle3 ?? null,
+      carouselDescription3: settings.carouselDescription3 ?? existing?.carouselDescription3 ?? null,
+      carouselImage3: settings.carouselImage3 ?? existing?.carouselImage3 ?? null,
+      carouselBackground3: settings.carouselBackground3 ?? existing?.carouselBackground3 ?? null,
+      carouselButton3: settings.carouselButton3 ?? existing?.carouselButton3 ?? null,
+      carouselUrl3: settings.carouselUrl3 ?? existing?.carouselUrl3 ?? null,
+      latitude: settings.latitude ?? existing?.latitude ?? '9.552533674221890',
+      longitude: settings.longitude ?? existing?.longitude ?? '-69.205197603437410',
+      paymentBank: settings.paymentBank ?? existing?.paymentBank ?? null,
+      paymentCI: settings.paymentCI ?? existing?.paymentCI ?? null,
+      paymentPhone: settings.paymentPhone ?? existing?.paymentPhone ?? null,
+      paymentInstructions: settings.paymentInstructions ?? existing?.paymentInstructions ?? null,
       updatedAt: new Date(),
     };
     this.siteSettings = updated;
@@ -436,15 +517,13 @@ export const storage: IStorage = (() => {
             const mod = await modPromise;
             postgresStorageInstance = new mod.PostgresStorage();
           }
-          // @ts-expect-error dynamic access
-          return postgresStorageInstance[prop](...args);
+          return (postgresStorageInstance as any)[prop](...args);
         };
       },
     };
     // The proxy type matches IStorage's async methods usage in routes
     // (all methods are awaited).
-    // @ts-expect-error proxy for async methods
-    return new Proxy({}, handler);
+    return new Proxy({}, handler) as IStorage;
   }
   return new MemStorage();
 })();

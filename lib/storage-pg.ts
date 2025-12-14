@@ -26,6 +26,11 @@ import {
 } from "@shared/schema";
 import { IStorage } from './storage';
 
+// Declarar tipo global para importProgress
+declare global {
+  var importProgress: Map<string, (data: any) => void> | undefined;
+}
+
 export class PostgresStorage implements IStorage {
   async getCategories(): Promise<Category[]> {
     return await db.select().from(categories);
@@ -200,8 +205,14 @@ export class PostgresStorage implements IStorage {
 
   async createProduct(product: InsertProduct): Promise<Product> {
     const productData = {
-      ...product,
+      name: product.name,
       price: product.price.toString(),
+      categoryId: product.categoryId,
+      imageUrl: product.imageUrl ?? null,
+      measurementType: product.measurementType,
+      externalCode: product.externalCode ?? null,
+      stock: product.stock ? product.stock.toString() : null,
+      featured: product.featured ?? false,
     };
     const result = await db.insert(products).values(productData).returning();
     return result[0];

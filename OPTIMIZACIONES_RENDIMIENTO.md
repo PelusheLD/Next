@@ -91,3 +91,5 @@ Después de aplicar los cambios, verifica los tiempos en la terminal:
 3. **Compresión:** Habilitar gzip/brotli en Next.js
 4. **CDN:** Usar CDN para assets estáticos
 
+
+

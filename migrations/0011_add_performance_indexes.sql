@@ -21,3 +21,5 @@ CREATE INDEX IF NOT EXISTS idx_categories_enabled ON categories(enabled) WHERE e
 -- Índice para order items por order_id (usado al cargar pedidos)
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 
+
+

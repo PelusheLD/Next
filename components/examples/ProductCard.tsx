@@ -6,7 +6,8 @@ export default function ProductCardExample() {
       <ProductCard
         id="1"
         name="Coca Cola 2L"
-        price={3.50}
+        price="3.50"
+        measurementType="unit"
         onAddToCart={() => console.log('Added to cart')}
       />
     </div>

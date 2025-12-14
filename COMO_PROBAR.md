@@ -89,3 +89,5 @@ Si es la primera vez que ejecutas el proyecto, asegúrate de tener:
 - Variables de entorno configuradas (archivo `.env` si usas base de datos)
 - Todas las dependencias instaladas (`npm install`)
 
+
+

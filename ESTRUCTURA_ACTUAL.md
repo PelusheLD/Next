@@ -74,3 +74,5 @@ Puedes eliminar estas carpetas/archivos de forma segura:
 2. Verificar que todo funciona correctamente
 3. Si usas `seed.ts`, moverlo primero a `lib/`
 
+
+

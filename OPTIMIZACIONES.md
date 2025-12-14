@@ -40,3 +40,5 @@
 
 4. **Compresión:** Habilitar compresión en Next.js para respuestas más rápidas
 
+
+
