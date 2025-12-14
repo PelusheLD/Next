@@ -160,11 +160,15 @@ export class PostgresStorage implements IStorage {
     }
     
     try {
-      // Optimización: usar SQL LIKE para búsqueda en base de datos en lugar de cargar todo en memoria
-      // Construir condiciones LIKE para cada palabra
+      console.log('PostgresStorage.searchProductsByCategory:', { categoryId, searchTerm, searchWords, page, limit });
+      
+      // Optimización: usar SQL ILIKE (case-insensitive) para búsqueda en base de datos
+      // Construir condiciones ILIKE para cada palabra (todas deben estar presentes - AND)
       const conditions = searchWords.map(word => 
-        like(products.name, `%${word}%`)
+        sql`LOWER(${products.name}) LIKE LOWER(${'%' + word + '%'})`
       );
+      
+      console.log('Search conditions count:', conditions.length);
       
       // Contar total de resultados
       const totalResult = await db
@@ -176,6 +180,7 @@ export class PostgresStorage implements IStorage {
         ));
       
       const total = Number(totalResult[0]?.count || 0);
+      console.log('Total results found:', total);
       
       // Obtener productos paginados directamente desde la BD
       const productsResult = await db
@@ -188,6 +193,8 @@ export class PostgresStorage implements IStorage {
         .orderBy(asc(products.name))
         .limit(limit)
         .offset(offset);
+      
+      console.log('Products returned:', productsResult.length);
       
       const hasMore = offset + productsResult.length < total;
       

@@ -11,9 +11,13 @@ export async function GET(
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '100', 10);
     const search = request.nextUrl.searchParams.get('search');
     
+    console.log('API /products/category/[categoryId]:', { categoryId, page, limit, search });
+    
     // Si hay búsqueda, usar el endpoint de búsqueda
     if (search && search.trim()) {
+      console.log('Using searchProductsByCategory with search term:', search.trim());
       const result = await storage.searchProductsByCategory(categoryId, search.trim(), page, limit);
+      console.log('Search result:', { total: result.total, productsCount: result.products.length, hasMore: result.hasMore });
       return NextResponse.json(result);
     }
     // Si no hay parámetros de paginación, devolver todos los productos (compatibilidad)
@@ -25,6 +29,7 @@ export async function GET(
       return NextResponse.json(result);
     }
   } catch (error) {
+    console.error('Error in /products/category/[categoryId]:', error);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
 }
