@@ -56,16 +56,28 @@ export async function POST(request: NextRequest) {
     // Guardar archivo temporalmente
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const tempFilePath = join(tmpdir(), `import_${sessionId}_${Date.now()}.xlsx`);
+    // Usar la extensión correcta del archivo original
+    const fileExtension = file.name.toLowerCase().endsWith('.xlsx') ? '.xlsx' : '.xls';
+    const tempFilePath = join(tmpdir(), `import_${sessionId}_${Date.now()}${fileExtension}`);
     
     try {
       await writeFile(tempFilePath, buffer);
+      console.log('File saved to:', tempFilePath);
+      console.log('Session ID:', sessionId);
+      console.log('Global importProgress exists:', !!global.importProgress);
+      console.log('Global importProgress has sessionId:', global.importProgress?.has(sessionId));
+
+      // Esperar un momento para asegurar que el SSE se haya conectado
+      // Esto da tiempo para que el cliente establezca la conexión SSE
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Procesar importación de forma asíncrona
       // No esperamos a que termine, retornamos inmediatamente
       // El progreso se enviará via SSE
+      console.log('Starting import process...');
       storage.importProductsFromExcel(tempFilePath, sessionId)
         .then(async (result) => {
+          console.log('Import completed:', result);
           // Limpiar archivo temporal
           try {
             await unlink(tempFilePath);
@@ -75,6 +87,7 @@ export async function POST(request: NextRequest) {
 
           // Enviar progreso final
           if (global.importProgress?.has(sessionId)) {
+            console.log('Sending complete message to SSE');
             global.importProgress.get(sessionId)!({
               type: 'complete',
               message: `Importación completada. ${result.imported} productos importados, ${result.errors.length} errores.`,
@@ -85,9 +98,12 @@ export async function POST(request: NextRequest) {
             setTimeout(() => {
               global.importProgress?.delete(sessionId);
             }, 5000);
+          } else {
+            console.warn('No SSE callback found for sessionId:', sessionId);
           }
         })
         .catch(async (error) => {
+          console.error('Import error:', error);
           // Limpiar archivo temporal en caso de error
           try {
             await unlink(tempFilePath);
@@ -97,6 +113,7 @@ export async function POST(request: NextRequest) {
 
           // Enviar error
           if (global.importProgress?.has(sessionId)) {
+            console.log('Sending error message to SSE');
             global.importProgress.get(sessionId)!({
               type: 'error',
               message: `Error durante la importación: ${error.message || 'Error desconocido'}`,
@@ -105,6 +122,8 @@ export async function POST(request: NextRequest) {
             setTimeout(() => {
               global.importProgress?.delete(sessionId);
             }, 5000);
+          } else {
+            console.warn('No SSE callback found for sessionId (error):', sessionId);
           }
         });
 

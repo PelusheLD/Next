@@ -27,15 +27,22 @@ export async function GET(
 
       // Enviar mensaje de conexión
       send({ type: 'connected', message: 'Conectado al servidor' });
+      console.log('SSE endpoint: Connection established for sessionId:', sessionId);
 
       // Configurar callback para recibir progreso
       const progressCallback = (data: any) => {
-        send(data);
+        console.log('SSE endpoint: Progress callback called with data:', data);
+        try {
+          send(data);
+        } catch (error) {
+          console.error('SSE endpoint: Error sending data:', error);
+        }
         
         // Cerrar conexión si es complete o error
         if (data.type === 'complete' || data.type === 'error') {
           setTimeout(() => {
             controller.close();
+            console.log('SSE endpoint: Connection closed');
           }, 1000);
         }
       };
@@ -46,6 +53,8 @@ export async function GET(
       }
       if (global.importProgress) {
         global.importProgress.set(sessionId, progressCallback);
+        console.log('SSE endpoint: Callback registered for sessionId:', sessionId);
+        console.log('SSE endpoint: Total callbacks:', global.importProgress.size);
       }
 
       // Limpiar cuando el cliente se desconecte

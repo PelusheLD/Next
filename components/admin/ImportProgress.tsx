@@ -27,6 +27,9 @@ export default function ImportProgress({ sessionId, onComplete, onError }: Impor
   useEffect(() => {
     if (!sessionId) return;
 
+    // Mostrar estado inicial de conexión
+    setProgress({ type: 'connected', message: 'Conectando al servidor...' });
+
     // Crear conexión Server-Sent Events
     // Nota: EventSource no soporta headers personalizados, pero este endpoint no requiere autenticación
     const eventSource = new EventSource(buildApiUrl(`/api/products/import-progress/${sessionId}`));
@@ -34,11 +37,13 @@ export default function ImportProgress({ sessionId, onComplete, onError }: Impor
 
     eventSource.onopen = () => {
       setIsConnected(true);
+      console.log('SSE connection opened for session:', sessionId);
     };
 
     eventSource.onmessage = (event) => {
       try {
         const data: ProgressData = JSON.parse(event.data);
+        console.log('SSE message received:', data);
         setProgress(data);
 
         if (data.type === 'complete') {
@@ -56,6 +61,11 @@ export default function ImportProgress({ sessionId, onComplete, onError }: Impor
     eventSource.onerror = (error) => {
       console.error('EventSource error:', error);
       setIsConnected(false);
+      // Mostrar error si la conexión falla
+      setProgress({ 
+        type: 'error', 
+        message: 'Error de conexión. Verifica la consola para más detalles.' 
+      });
     };
 
     // Cleanup
